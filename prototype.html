@@ -159,6 +159,16 @@ body.rtl .data-table th{text-align:right}
 .chat-suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .suggest-chip{background:var(--navy3);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);cursor:pointer;transition:all 0.15s;flex-shrink:0}
 .suggest-chip:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.08)}
+.chat-card{background:rgba(20,32,52,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;box-shadow:0 12px 30px rgba(0,0,0,0.18);margin-top:10px}
+.chat-card-header{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px}
+.chat-card-copy{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px}
+.chat-card-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.chat-card-table th{text-align:left;padding:8px 10px;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:600}
+.chat-card-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--text2)}
+.chat-card-table tr:last-child td{border-bottom:none}
+.chat-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chat-card-btn{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(201,168,76,0.12);color:var(--text);font-size:12px;cursor:pointer;transition:all 0.18s}
+.chat-card-btn:hover{background:var(--gold);color:#09111f;border-color:rgba(201,168,76,0.35)}
 .chat-input-row{display:flex;gap:10px;padding-top:12px;border-top:1px solid var(--border)}
 .chat-input{flex:1;background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:10px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border 0.15s;resize:none;height:44px}
 body.rtl .chat-input{font-family:'Cairo',sans-serif}
@@ -852,25 +862,113 @@ function simulateUpload() {
 
 // ===== CHAT =====
 const aiResponses = {
-  profit: {en:"This month's profit summary:\n\n• Total Revenue: SAR 842,000\n• Total Cost: SAR 598,000\n• Net Profit: SAR 244,000 (29% margin)\n• Breakeven: SAR 620,000 ✓ achieved\n\nTop performers: Khalid Al-Farsi (SAR +24,200), Sara Haddad (SAR +14,800)\nAt-loss instructors: Tariq Mansoor (-SAR 4,500), Omar Nasser (-SAR 2,100)", ar:"ملخص أرباح هذا الشهر:\n\n• إجمالي الإيرادات: 842,000 ريال\n• التكاليف الإجمالية: 598,000 ريال\n• صافي الربح: 244,000 ريال (هامش 29٪)\n• نقطة التعادل: 620,000 ريال ✓\n\nأفضل المدرسين: خالد الفارسي (+24,200 ريال)\nالمدرسون في خسارة: طارق منصور (-4,500 ريال)"},
-  loss: {en:"Two instructors are currently operating at a financial loss:\n\n1. Tariq Mansoor (Finance Dept)\n   Revenue: SAR 31,000 | Cost: SAR 35,500\n   Net Loss: -SAR 4,500 | Risk Score: 9.2/10 🔴\n\n2. Omar Nasser (Design Dept)\n   Revenue: SAR 38,500 | Cost: SAR 40,600\n   Net Loss: -SAR 2,100 | Risk Score: 7.8/10 🟠\n\nRecommendation: Review enrollment targets and reduce overhead costs for both instructors.", ar:"يوجد حالياً مدرسان في خسارة مالية:\n\n1. طارق منصور (قسم المالية)\n   الإيرادات: 31,000 | التكاليف: 35,500\n   الخسارة: -4,500 ريال | نتيجة المخاطر: 9.2/10 🔴\n\n2. عمر ناصر (قسم التصميم)\n   الإيرادات: 38,500 | التكاليف: 40,600\n   الخسارة: -2,100 ريال | نتيجة المخاطر: 7.8/10 🟠"},
-  breakeven: {en:"Your academy's breakeven point is SAR 620,000 per month.\n\nCurrent Revenue: SAR 842,000\nBreakeven Buffer: SAR 222,000 (35.8% above breakeven)\n\nFixed Costs: SAR 380,000 | Variable Costs: SAR 218,000\n\nYou are safely above breakeven. However, 2 departments (Design, Finance) are operating below their individual breakeven thresholds.", ar:"نقطة التعادل للأكاديمية هي 620,000 ريال شهرياً.\n\nالإيرادات الحالية: 842,000 ريال\nهامش الأمان: 222,000 ريال (35.8٪ فوق التعادل)\n\nالتكاليف الثابتة: 380,000 | المتغيرة: 218,000\n\nالوضع آمن، لكن قسمي التصميم والمالية دون نقطة التعادل الخاصة بهما."},
-  risk: {en:"Top 3 Risks This Week:\n\n🔴 CRITICAL – Tariq Mansoor\nFinancial loss (-SAR 4,500) + negative feedback ('boring', 'unclear', Arabic: غير مفيد). Risk Score: 9.2/10\n\n🟠 HIGH – Omar Nasser\nFinancial loss (-SAR 2,100) + low rating 3.2/5. Keywords: 'confused', 'slow'. Risk Score: 7.8/10\n\n🟡 MEDIUM – Hana Al-Khatib\nProfitable but feedback declining. Score: 5.4/10\n\nAction recommended: Flag Tariq for immediate review.", ar:"أبرز 3 مخاطر هذا الأسبوع:\n\n🔴 حرج – طارق منصور\nخسارة مالية (-4,500 ريال) + ملاحظات سلبية (غير مفيد، ممل). النتيجة: 9.2/10\n\n🟠 مرتفع – عمر ناصر\nخسارة (-2,100 ريال) + تقييم منخفض 3.2/5. النتيجة: 7.8/10\n\n🟡 متوسط – هناء الخطيب\nرابحة لكن الملاحظات تتراجع. النتيجة: 5.4/10"},
-  roi: {en:"ROI Comparison – Traditional vs Autonomous:\n\n📊 Autonomous Model\n• ROI: 3.8x | Delivery Speed: +42%\n• Completion Rate: 74% | Cost/Student: SAR 482\n\n📋 Traditional Model\n• ROI: 2.1x | Delivery Speed: Baseline\n• Completion Rate: 65% | Cost/Student: SAR 588\n\n✅ Autonomous programs outperform traditional by 81% on ROI. Recommended expansion: Business and Technology departments show highest autonomous gains.", ar:"مقارنة عائد الاستثمار – تقليدي مقابل مستقل:\n\n📊 النموذج المستقل\n• العائد: 3.8x | السرعة: +42٪\n• معدل الإتمام: 74٪ | التكلفة/طالب: 482 ريال\n\n📋 النموذج التقليدي\n• العائد: 2.1x | المعدل الأساسي\n• معدل الإتمام: 65٪ | التكلفة/طالب: 588 ريال\n\n✅ البرامج المستقلة أفضل بنسبة 81٪ في العائد."},
-  instructor: {en:"Instructor to review this week:\n\n🔴 Priority 1: Tariq Mansoor\nCritical financial loss + worst feedback scores. Immediate action needed.\n\n🟠 Priority 2: Omar Nasser\nHigh financial risk, low student satisfaction.\n\n💡 Suggested Action: Schedule performance review meetings for both. Consider course restructuring for Finance department to reduce overhead.", ar:"المدرس المقترح لمراجعته هذا الأسبوع:\n\n🔴 الأولوية الأولى: طارق منصور\nخسارة مالية حرجة + أضعف تقييمات. يتطلب إجراءً فورياً.\n\n🟠 الأولوية الثانية: عمر ناصر\nمخاطر مالية عالية، رضا طلاب منخفض."},
-  default: {en:"I found relevant data for your query. Based on April 2026 data:\n\n• Financial Health: SAR 244K net profit (29% margin)\n• Risk Alerts: 3 active (1 critical, 1 high, 1 medium)\n• Top Instructor: Khalid Al-Farsi (SAR 24,200 profit, 4.7 rating)\n• Overall Status: ✅ Above breakeven\n\nWould you like me to drill down into any specific area — financials, risk, or benchmarking?", ar:"وجدت بيانات ذات صلة باستفسارك. استناداً إلى بيانات أبريل 2026:\n\n• الوضع المالي: 244,000 ريال صافي ربح\n• تنبيهات المخاطر: 3 نشطة\n• أفضل مدرس: خالد الفارسي\n\nهل تريد التعمق في منطقة معينة؟"}
+  profit: {
+    en:`<div class="chat-card"><div class="chat-card-header">Monthly Profit Summary</div><div class="chat-card-copy">This month's profit summary:<br>• Total Revenue: SAR 842,000<br>• Total Cost: SAR 598,000<br>• Net Profit: SAR 244,000 (29% margin)<br>• Breakeven: SAR 620,000 ✓ achieved<br><strong>Top performers</strong>: Khalid Al-Farsi (+SAR 24,200), Sara Haddad (+SAR 14,800)</div><div class="chart-wrap" style="height:220px"><canvas data-chat-chart="revenueTrend"></canvas></div></div>`,
+    ar:`<div class="chat-card"><div class="chat-card-header">ملخص أرباح الشهر</div><div class="chat-card-copy">ملخص هذا الشهر:<br>• إجمالي الإيرادات: 842,000 ريال<br>• التكاليف الإجمالية: 598,000 ريال<br>• صافي الربح: 244,000 ريال (هامش 29٪)<br>• نقطة التعادل: 620,000 ريال ✓<br><strong>أفضل المدرسين</strong>: خالد الفارسي (+24,200 ريال)، سارة حداد (+14,800 ريال)</div><div class="chart-wrap" style="height:220px"><canvas data-chat-chart="revenueTrend"></canvas></div></div>`
+  },
+  loss: {
+    en:`<div class="chat-card"><div class="chat-card-header">Financial Loss Alert</div><div class="chat-card-copy">Two instructors are currently operating at a financial loss. Recommended actions are included below.</div><table class="chat-card-table"><thead><tr><th>Instructor</th><th>Revenue</th><th>Cost</th><th>Net</th></tr></thead><tbody><tr><td>Omar Nasser</td><td>SAR 38,500</td><td>SAR 40,600</td><td style="color:#e05555">-SAR 2,100</td></tr><tr><td>Tariq Mansoor</td><td>SAR 31,000</td><td>SAR 35,500</td><td style="color:#e05555">-SAR 4,500</td></tr></tbody></table><div class="chat-card-actions"><button class="chat-card-btn" onclick="actionDone(this,'Flagged for Review')">Flag for Review</button><button class="chat-card-btn" onclick="actionDone(this,'Recommend Retention')">Recommend Retention</button></div></div>`,
+    ar:`<div class="chat-card"><div class="chat-card-header">تنبيه خسارة مالية</div><div class="chat-card-copy">يوجد حالياً مدرسان في خسارة مالية. تم تضمين الإجراءات المقترحة أدناه.</div><table class="chat-card-table"><thead><tr><th>المدرس</th><th>الإيراد</th><th>التكلفة</th><th>الصافي</th></tr></thead><tbody><tr><td>عمر ناصر</td><td>38,500 ريال</td><td>40,600 ريال</td><td style="color:#e05555">-2,100 ريال</td></tr><tr><td>طارق منصور</td><td>31,000 ريال</td><td>35,500 ريال</td><td style="color:#e05555">-4,500 ريال</td></tr></tbody></table><div class="chat-card-actions"><button class="chat-card-btn" onclick="actionDone(this,'تم التعليم للمراجعة')">تعليم للمراجعة</button><button class="chat-card-btn" onclick="actionDone(this,'تم اقتراح احتفاظ')">اقتراح احتفاظ</button></div></div>`
+  },
+  breakeven: {
+    en:`<div class="chat-card"><div class="chat-card-header">Breakeven Analysis</div><div class="chat-card-copy">Your academy's breakeven point is SAR 620,000 per month.<br>Current Revenue: SAR 842,000<br>Breakeven Buffer: SAR 222,000 (35.8% above breakeven)<br>Fixed Costs: SAR 380,000 | Variable Costs: SAR 218,000<br>You are safely above breakeven, but Design and Finance departments remain below their thresholds.</div><div class="chart-wrap" style="height:220px"><canvas data-chat-chart="breakevenTrend"></canvas></div></div>`,
+    ar:`<div class="chat-card"><div class="chat-card-header">تحليل نقطة التعادل</div><div class="chat-card-copy">نقطة التعادل للأكاديمية هي 620,000 ريال شهرياً.<br>الإيرادات الحالية: 842,000 ريال<br>هامش الأمان: 222,000 ريال (35.8٪ فوق التعادل)<br>التكاليف الثابتة: 380,000 ريال | المتغيرة: 218,000 ريال<br>الوضع آمن، لكن قسمي التصميم والمالية دون نقطة التعادل الخاصة بهما.</div><div class="chart-wrap" style="height:220px"><canvas data-chat-chart="breakevenTrend"></canvas></div></div>`
+  },
+  risk: {
+    en:`<div class="chat-card"><div class="chat-card-header">Operational Risk Overview</div><div class="chat-card-copy">Keyword-based NLP has surfaced active feedback risks. Critical and high risk instructors are shown below.</div><div class="heatmap" style="margin-top:12px"><div class="heat-cell heat-crit" onclick="showRiskDetail('Tariq Mansoor','Critical')"><div class="hc-label">Tariq M.</div><div class="hc-score">9.2</div></div><div class="heat-cell heat-high" onclick="showRiskDetail('Omar Nasser','High')"><div class="hc-label">Omar N.</div><div class="hc-score">7.8</div></div><div class="heat-cell heat-med" onclick="showRiskDetail('Hana K.','Medium')"><div class="hc-label">Hana K.</div><div class="hc-score">5.4</div></div></div><div class="chart-wrap" style="height:220px; margin-top:16px"><canvas data-chat-chart="keywordFreq"></canvas></div></div>`,
+    ar:`<div class="chat-card"><div class="chat-card-header">نظرة عامة على المخاطر التشغيلية</div><div class="chat-card-copy">تم تحديد مخاطر الملاحظات النشطة باستخدام الكلمات المفتاحية. يتم عرض حالات المخاطر الحرجة والعالية أدناه.</div><div class="heatmap" style="margin-top:12px"><div class="heat-cell heat-crit" onclick="showRiskDetail('طارق منصور','حرجة')"><div class="hc-label">طارق م.</div><div class="hc-score">9.2</div></div><div class="heat-cell heat-high" onclick="showRiskDetail('عمر ناصر','مرتفعة')"><div class="hc-label">عمر ن.</div><div class="hc-score">7.8</div></div><div class="heat-cell heat-med" onclick="showRiskDetail('هناء ك.','متوسط')"><div class="hc-label">هناء ك.</div><div class="hc-score">5.4</div></div></div><div class="chart-wrap" style="height:220px; margin-top:16px"><canvas data-chat-chart="keywordFreq"></canvas></div></div>`
+  },
+  roi: {
+    en:`<div class="chat-card"><div class="chat-card-header">ROI Comparison</div><div class="chat-card-copy">Autonomous delivery is ahead of traditional by 81% on ROI. Cost per student and completion rates also favor autonomous programs.</div><div class="chart-wrap" style="height:220px"><canvas data-chat-chart="roiTrend"></canvas></div></div>`,
+    ar:`<div class="chat-card"><div class="chat-card-header">مقارنة العائد على الاستثمار</div><div class="chat-card-copy">البرامج المستقلة تتفوق على التقليدية بنسبة 81٪ في العائد. التكلفة لكل طالب ومعدلات الإكمال تدعم النموذج المستقل.</div><div class="chart-wrap" style="height:220px"><canvas data-chat-chart="roiTrend"></canvas></div></div>`
+  },
+  instructor: {
+    en:`<div class="chat-card"><div class="chat-card-header">Instructor Review Recommendation</div><div class="chat-card-copy">Priority review recommended for instructors with the highest risk and financial impact.</div><table class="chat-card-table"><thead><tr><th>Instructor</th><th>Risk</th><th>Net</th><th>Rating</th></tr></thead><tbody><tr><td>Tariq Mansoor</td><td>Critical</td><td style="color:#e05555">-SAR 4,500</td><td>2.9</td></tr><tr><td>Omar Nasser</td><td>High</td><td style="color:#e05555">-SAR 2,100</td><td>3.2</td></tr></tbody></table><div class="chat-card-actions"><button class="chat-card-btn" onclick="actionDone(this,'Review Scheduled')">Review Scheduled</button><button class="chat-card-btn" onclick="actionDone(this,'Escalated')">Escalated</button></div></div>`,
+    ar:`<div class="chat-card"><div class="chat-card-header">توصية مراجعة المدرس</div><div class="chat-card-copy">يوصى بمراجعة المدرسين ذوي أعلى مخاطر وتأثير مالي.</div><table class="chat-card-table"><thead><tr><th>المدرس</th><th>المخاطر</th><th>الصافي</th><th>التقييم</th></tr></thead><tbody><tr><td>طارق منصور</td><td>حرجة</td><td style="color:#e05555">-4,500 ريال</td><td>2.9</td></tr><tr><td>عمر ناصر</td><td>مرتفعة</td><td style="color:#e05555">-2,100 ريال</td><td>3.2</td></tr></tbody></table><div class="chat-card-actions"><button class="chat-card-btn" onclick="actionDone(this,'تم جدولة المراجعة')">تم جدولة المراجعة</button><button class="chat-card-btn" onclick="actionDone(this,'تم التصعيد')">تم التصعيد</button></div></div>`
+  },
+  default: {
+    en:`<div class="chat-card"><div class="chat-card-header">Summary</div><div class="chat-card-copy">I found relevant data for your query. Based on April 2026 data:<br>• Financial Health: SAR 244K net profit (29% margin)<br>• Risk Alerts: 3 active (1 critical, 1 high, 1 medium)<br>• Top Instructor: Khalid Al-Farsi (SAR 24,200 profit, 4.7 rating)<br>• Overall Status: ✅ Above breakeven<br><br>Would you like me to drill down into financials, risk, or benchmarking?</div></div>`,
+    ar:`<div class="chat-card"><div class="chat-card-header">الملخص</div><div class="chat-card-copy">وجدت بيانات ذات صلة باستفسارك. استناداً إلى بيانات أبريل 2026:<br>• الوضع المالي: 244,000 ريال صافي ربح<br>• تنبيهات المخاطر: 3 نشطة<br>• أفضل مدرس: خالد الفارسي<br>• الوضع العام: ✅ فوق نقطة التعادل<br><br>هل تريد التعمق في المالي، المخاطر، أم المعايير؟</div></div>`
+  }
+};
+
+const aiResponseSteps = {
+  profit: [
+    aiResponses.profit,
+    `<div class="chat-card"><div class="chat-card-header">Next Steps</div><div class="chat-card-copy">Focus on revenue growth and instructor efficiency to push margins higher. Would you like a deeper chart by instructor performance or cost driver breakdown?</div><div class="chat-card-actions"><button class="chat-card-btn" onclick="actionDone(this,'Instructor Performance')">Instructor Performance</button><button class="chat-card-btn" onclick="actionDone(this,'Cost Driver Breakdown')">Cost Driver Breakdown</button></div></div>`
+  ],
+  loss: [
+    aiResponses.loss,
+    `<div class="chat-card"><div class="chat-card-header">Actionable Guidance</div><div class="chat-card-copy">These instructors need priority review and cost optimization. Use the buttons below to schedule the review or retain them with coaching support.</div><div class="chat-card-actions"><button class="chat-card-btn" onclick="actionDone(this,'Schedule Review')">Schedule Review</button><button class="chat-card-btn" onclick="actionDone(this,'Offer Support Plan')">Offer Support Plan</button></div></div>`
+  ],
+  breakeven: [
+    aiResponses.breakeven,
+    `<div class="chat-card"><div class="chat-card-header">Breakeven Insight</div><div class="chat-card-copy">Your overall margin is healthy, but two departments are below breakeven. Update pricing or instructor allocation in Design and Finance to push overall safety further.</div></div>`
+  ],
+  risk: [
+    aiResponses.risk,
+    `<div class="chat-card"><div class="chat-card-header">Risk Mitigation</div><div class="chat-card-copy">Respond quickly to the highlighted critical feedback. Clicking the risk cells will show the exact issue. You can also generate an instructor coaching plan.</div></div>`
+  ],
+  roi: [
+    aiResponses.roi,
+    `<div class="chat-card"><div class="chat-card-header">ROI Recommendation</div><div class="chat-card-copy">Autonomous delivery is significantly outperforming traditional models. Recommend reinvesting in autonomous content, instructor training, and digital delivery tools.</div></div>`
+  ],
+  instructor: [
+    aiResponses.instructor,
+    `<div class="chat-card"><div class="chat-card-header">Review Plan</div><div class="chat-card-copy">We can assign a detailed improvement plan for each instructor. Select the one you want to review first.</div><div class="chat-card-actions"><button class="chat-card-btn" onclick="actionDone(this,'Review Tariq')">Review Tariq</button><button class="chat-card-btn" onclick="actionDone(this,'Review Omar')">Review Omar</button></div></div>`
+  ],
+  default: [
+    aiResponses.default,
+    `<div class="chat-card"><div class="chat-card-header">What Next?</div><div class="chat-card-copy">I can show charts, instructor comparisons, or senior leadership insights. Ask me for the next dashboard view you want.</div></div>`
+  ]
+};
+
+const chatChartConfigs = {
+  revenueTrend: {
+    type:'line',
+    data:{labels:['Nov','Dec','Jan','Feb','Mar','Apr'],datasets:[{label:'Revenue',data:[620,680,710,750,800,842],borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.08)',borderWidth:2,pointRadius:4,fill:true,tension:0.4},{label:'Cost',data:[580,610,570,590,580,598],borderColor:'#4a8de0',backgroundColor:'rgba(74,141,224,0.05)',borderWidth:2,pointRadius:4,fill:true,tension:0.4,borderDash:[5,3]}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:false,min:500,ticks:{callback:v=>'SAR '+v+'K'}}}}
+  },
+  breakevenTrend: {
+    type:'bar',
+    data:{labels:['Design','Finance','Business','Tech'],datasets:[{label:'Department breakeven gap',data:[-18000,-12000,8000,12300],backgroundColor:['rgba(224,85,85,0.75)','rgba(224,85,85,0.65)','rgba(76,175,130,0.7)','rgba(76,175,130,0.5)'],borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v<0?'-SAR '+Math.abs(v).toLocaleString():'SAR '+v.toLocaleString()}}}}
+  },
+  keywordFreq: {
+    type:'bar',
+    indexAxis:'y',
+    data:{labels:['غير مفيد','boring','unclear','confused','waste of time','ممل','slow'],datasets:[{data:[18,15,12,10,9,8,7],backgroundColor:['#e05555','#e05555','#e05555','#e09b3a','#e05555','#e05555','#e09b3a'],borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}}}}
+  },
+  roiTrend: {
+    type:'line',
+    data:{labels:['Nov','Dec','Jan','Feb','Mar','Apr'],datasets:[{label:'Autonomous',data:[2.8,3.0,3.2,3.4,3.6,3.8],borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.08)',borderWidth:2,pointRadius:4,fill:true,tension:0.4},{label:'Traditional',data:[2.0,2.0,2.1,2.1,2.1,2.1],borderColor:'#4a8de0',backgroundColor:'rgba(74,141,224,0.04)',borderWidth:2,pointRadius:4,fill:true,tension:0.4,borderDash:[5,3]}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:1.5,ticks:{callback:v=>v.toFixed(1)+'x'}}}}
+  }
 };
 
 function getAIResponse(msg) {
   const lower = msg.toLowerCase();
-  if(lower.includes('profit') || lower.includes('summary') || lower.includes('ملخص') || lower.includes('أرباح')) return aiResponses.profit;
-  if(lower.includes('loss') || lower.includes('خسارة')) return aiResponses.loss;
-  if(lower.includes('breakeven') || lower.includes('تعادل')) return aiResponses.breakeven;
-  if(lower.includes('risk') || lower.includes('مخاطر') || lower.includes('تنبيه')) return aiResponses.risk;
-  if(lower.includes('roi') || lower.includes('benchmark') || lower.includes('autonomous') || lower.includes('مستقل') || lower.includes('عائد')) return aiResponses.roi;
-  if(lower.includes('instructor') || lower.includes('review') || lower.includes('مدرس')) return aiResponses.instructor;
-  if(lower.includes('financial') || lower.includes('مالي')) return aiResponses.profit;
-  return aiResponses.default;
+  let key = 'default';
+  if(lower.includes('profit') || lower.includes('summary') || lower.includes('ملخص') || lower.includes('أرباح')) key = 'profit';
+  else if(lower.includes('loss') || lower.includes('خسارة')) key = 'loss';
+  else if(lower.includes('breakeven') || lower.includes('تعادل')) key = 'breakeven';
+  else if(lower.includes('risk') || lower.includes('مخاطر') || lower.includes('تنبيه')) key = 'risk';
+  else if(lower.includes('roi') || lower.includes('benchmark') || lower.includes('autonomous') || lower.includes('مستقل') || lower.includes('عائد')) key = 'roi';
+  else if(lower.includes('instructor') || lower.includes('review') || lower.includes('مدرس')) key = 'instructor';
+  else if(lower.includes('financial') || lower.includes('مالي')) key = 'profit';
+  return aiResponseSteps[key] || [aiResponses[key] || aiResponses.default];
+}
+
+function renderChatCharts(container=document) {
+  const canvases = container.querySelectorAll('canvas[data-chat-chart]:not([data-chat-init])');
+  canvases.forEach(canvas => {
+    const key = canvas.dataset.chatChart;
+    const config = chatChartConfigs[key];
+    if (!config) return;
+    new Chart(canvas, config);
+    canvas.dataset.chatInit = '1';
+  });
 }
 
 function addMsg(text, role) {
@@ -878,8 +976,23 @@ function addMsg(text, role) {
   const now = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   const div = document.createElement('div');
   div.className = 'msg '+role;
-  div.innerHTML = `<div class="msg-avatar ${role}">${role==='ai'?'AI':'CEO'}</div><div><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-meta">${now}</div></div>`;
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  if (/<[^>]+>/.test(text)) bubble.innerHTML = text;
+  else bubble.innerHTML = text.replace(/\n/g,'<br>');
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar '+role;
+  avatar.textContent = role==='ai' ? 'AI' : 'CEO';
+  const wrapper = document.createElement('div');
+  wrapper.appendChild(bubble);
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+  meta.textContent = now;
+  wrapper.appendChild(meta);
+  div.appendChild(avatar);
+  div.appendChild(wrapper);
   msgs.appendChild(div);
+  renderChatCharts(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
@@ -900,8 +1013,19 @@ function sendChat(forcedText) {
   setTimeout(() => {
     document.getElementById('typing')?.remove();
     const resp = getAIResponse(msg);
-    addMsg(resp[currentLang]||resp.en, 'ai');
+    playAIResponse(resp);
   }, delay);
+}
+
+function playAIResponse(steps, index = 0) {
+  if (!Array.isArray(steps)) steps = [steps];
+  if (index >= steps.length) return;
+  const text = steps[index];
+  const message = typeof text === 'object' ? text[currentLang] || text.en : text;
+  addMsg(message, 'ai');
+  if (index + 1 < steps.length) {
+    setTimeout(() => playAIResponse(steps, index + 1), 500);
+  }
 }
 
 function injectMsg(text) {
